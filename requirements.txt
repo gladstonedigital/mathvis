@@ -1,8 +1,9 @@
 cycler==0.10.0
 matplotlib==2.1.0
 numpy==1.13.3
-pkg-resources==0.0.0
 pyparsing==2.2.0
+PyQt5==5.9
 python-dateutil==2.6.1
 pytz==2017.2
+sip==4.19.3
 six==1.11.0
