@@ -86,6 +86,7 @@ class PlotCanvas(FigureCanvas):
                 QSizePolicy.Expanding,
                 QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+        self.plot([i for i in range(25)], [random.random() for i in range(25)])
 
     def plot(self, x_data, y_data, title=None):
         ax = self.figure.add_subplot(111)

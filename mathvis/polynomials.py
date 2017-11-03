@@ -94,7 +94,7 @@ class Trinomial():
             roots.append((-1 * self.b - self.radical) / (2 * self.a))
         return roots
 
-    def factor(self, p, verbose=False):
+    def factor(self, p=1, verbose=False):
         if p == 0:
             return None
 
