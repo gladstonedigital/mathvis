@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import argparse
 import math
 import numpy
@@ -35,14 +36,21 @@ class Binomial():
         return self.a*x + self.b
 
 class FactorPair():
-    def __init__(self, p, q, r, s):
-        self.binomials = []
-        self.binomials.append(Binomial(p, q))
-        self.binomials.append(Binomial(r, s))
-        self.p = p
-        self.q = q
-        self.r = r
-        self.s = s
+    def __init__(self, p=0, q=0, r=0, s=0, b1=None, b2=None):
+        if b1 != None and b2 != None:
+            self.binomials = [b1, b2]
+            self.p = b1.a
+            self.q = b1.b
+            self.r = b2.a
+            self.s = b2.b
+        else:
+            self.binomials = []
+            self.binomials.append(Binomial(p, q))
+            self.binomials.append(Binomial(r, s))
+            self.p = p
+            self.q = q
+            self.r = r
+            self.s = s
 
     def __iter__(self):
         return iter(self.binomials)
@@ -58,6 +66,9 @@ class FactorPair():
 
     def __str__(self):
         return "%s%s" % tuple(self)
+
+    def expand(self):
+        return Trinomial(self.p*self.r, self.p*self.s + self.q*self.r, self.q*self.s)
 
 class Trinomial():
     def __init__(self, a, b, c):
@@ -87,11 +98,15 @@ class Trinomial():
             return None
 
         roots = []
-        if self.radical == 0:
-            roots.append(-1 * self.b / (2 * self.a))
-        else:
-            roots.append((-1 * self.b + self.radical) / (2 * self.a))
-            roots.append((-1 * self.b - self.radical) / (2 * self.a))
+        if self.a == 0: # linear function
+            roots.append(-1 * self.c / self.b)
+        else: # quadratic function
+            if self.radical == 0:
+                roots.append(-1 * self.b / (2 * self.a))
+            else:
+                roots.append((-1 * self.b + self.radical) / (2 * self.a))
+                roots.append((-1 * self.b - self.radical) / (2 * self.a))
+
         return roots
 
     def factor(self, p=1, verbose=False):
@@ -104,10 +119,16 @@ class Trinomial():
         if p in self.factor_pairs:
             return self.factor_pairs[p]
 
-        p = Fraction(p)
-        r = self.a / p
-        q = (self.b - self.radical) / (2 * r)
-        s = (self.b + self.radical) / (2 * p)
+        if self.a == 0: # linear function
+            p = Fraction(p)
+            r = self.c * p / self.b
+            q = 0
+            s = self.b / p
+        else: # quadratic function
+            p = Fraction(p)
+            r = self.a / p
+            q = (self.b - self.radical) / (2 * r)
+            s = (self.b + self.radical) / (2 * p)
 
         if verbose:
             print("a=pr:      %s" % (self.a == p*r))
