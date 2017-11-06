@@ -2,8 +2,7 @@
 
 from fractions import Fraction
 from numbers import Complex, Rational, Real
-from math import sqrt, atan, cos, sin, log
-import cmath
+from math import sqrt, atan, cos, sin
 
 """
 Implementation of complex numbers (a+b*j) where the real and imaginary components \
@@ -99,9 +98,7 @@ are Fraction instances."""
         elif isinstance(power, CFraction):
             if power.imag == 0:
                 return a ** power.real
-            r = abs(a) if isinstance(a, Complex) else a
-            theta = atan(Fraction(a.imag, a.real))
-            z = cmath.exp(log(r)*power + CFraction(0, 1)*theta*power)
+            z = complex(a) ** complex(power)
             return CFraction(z.real, z.imag)
         else:
             z = complex(a) ** power
@@ -126,7 +123,7 @@ are Fraction instances."""
         return CFraction(other).__truediv__(self)
 
     def __str__(self):
-        return str(self.real) + ("+" if self.imag >= 0 else "-") + str(abs(self.imag)) + "j"
+        return "(" + str(self.real) + ("+" if self.imag >= 0 else "-") + str(abs(self.imag)) + "j)"
 
     def __repr__(self):
         return self.__str__()
