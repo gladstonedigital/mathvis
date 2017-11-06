@@ -84,9 +84,7 @@ are Fraction instances."""
         if isinstance(power, Rational):
             if power.denominator == 1:
                 power = power.numerator
-                if power == 0:
-                    return CFraction(1)
-                elif power > 0:
+                if power >= 0:
                     zn = CFraction(1)
                     while power > 0:
                         zn *= a
@@ -94,7 +92,6 @@ are Fraction instances."""
                     return zn
                 elif power < 0:
                     new_denominator = a.real.numerator**2*a.imag.denominator**2 + a.real.denominator**2*a.imag.numerator**2
-                    print(a)
                     return CFraction(Fraction((a.real.denominator*a.real.numerator*a.imag.denominator**2), new_denominator),
                         -1 * Fraction((a.real.denominator**2*a.imag.numerator*a.imag.denominator), new_denominator)) ** abs(power)
             else:
