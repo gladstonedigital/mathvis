@@ -37,6 +37,8 @@ class CFraction(Complex):
 
     def __init__(self, real, imag=0):
         """Coerce real and imaginary components to fractions"""
+        if isinstance(real, Complex):
+            real, imag = (real.real, real.imag)
         self._real = _Fraction(real)
         self._imag = _Fraction(imag)
 
