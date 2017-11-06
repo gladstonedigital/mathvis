@@ -91,21 +91,32 @@ class Trinomial():
         return self.a*(x**2) + self.b*x + self.c
 
     def find_roots(self):
+        """
         try:
             self.radical = Fraction(math.sqrt(self.b**2 - (4 * self.a * self.c)))
         except:
             self.radical = None
             return None
+        """
 
         roots = []
-        if self.a == 0: # linear function
-            roots.append(-1 * self.c / self.b)
-        else: # quadratic function
-            if self.radical == 0:
-                roots.append(-1 * self.b / (2 * self.a))
-            else:
-                roots.append((-1 * self.b + self.radical) / (2 * self.a))
-                roots.append((-1 * self.b - self.radical) / (2 * self.a))
+        discriminant = Fraction(self.b**2 - (4 * self.a * self.c))
+        if discriminant < 0: # complex solutions
+            self.radical = None
+            return None
+            #self.radical = complex(0, math.sqrt(-1 * discriminant))
+            #roots.append((-1 * self.b + self.radical) / (2 * self.a))
+            #roots.append((-1 * self.b - self.radical) / (2 * self.a))
+        else:
+            self.radical = Fraction(math.sqrt(discriminant))
+            if self.a == 0: # linear function
+                roots.append(-1 * self.c / self.b)
+            else: # quadratic function
+                if self.radical == 0:
+                    roots.append(-1 * self.b / (2 * self.a))
+                else:
+                    roots.append((-1 * self.b + self.radical) / (2 * self.a))
+                    roots.append((-1 * self.b - self.radical) / (2 * self.a))
 
         return roots
 
