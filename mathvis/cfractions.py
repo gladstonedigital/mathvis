@@ -24,8 +24,7 @@ Accuracy is not preserved during the following computations:
 """
 
 class CFraction(Complex):
-    """Store complex number of the form (a+b*j), where a and b \
-are Fraction instances."""
+    """Store complex number of the form (a+b*j), where a and b are Fraction instances."""
 
     def __init__(self, real, imag=0):
         self._real = Fraction(real)
