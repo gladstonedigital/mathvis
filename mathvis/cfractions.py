@@ -9,6 +9,10 @@ Implementation of complex numbers (a+b*j) where the real and imaginary component
 are represented as Fraction instances to preserve accuracy during most mathematical \
 operations.
 
+When accuracy is lost due to conversion to float in order to perform an operation, \
+the result is converted back into a CFraction instance before returning. Of course \
+this doesn't recovery any accuracy but the type stays the same.
+
 Accuracy is not preserved during the following computations:
     - __abs__(), magnitude implemented as sqrt(a**2 + b**2)
     - __complex__(), converting to a built-in complex type
@@ -16,6 +20,7 @@ Accuracy is not preserved during the following computations:
         (becomes float during calculation)
     - math operations involving a CFraction and most floating point numbers
         certain floats are able to be converted to Fractions correctly but most aren't
+    - CFraction raised to a fractional power
 """
 
 class CFraction(Complex):
