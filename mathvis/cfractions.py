@@ -91,6 +91,12 @@ class CFraction(Complex):
     def __rtruediv__(self, other):
         return other.__truediv__(self)
 
+    def __div__(self, other):
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        return other.__truediv__(self)
+
     def __str__(self):
         return str(self.real) + ("+" if self.imag >= 0 else "-") + str(abs(self.imag)) + "j"
 
