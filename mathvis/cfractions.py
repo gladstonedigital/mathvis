@@ -144,7 +144,7 @@ class CFraction(Complex):
             raise TypeError("unsupported operand type(s) for ** or pow(): '{}' and '{}'".format(a.__class__.__name__, power.__class__.__name__))
 
     def __rpow__(power, a):
-        return a.__pow__(power)
+        return CFraction(a).__pow__(power)
 
 # Conversions
     def __str__(self):
