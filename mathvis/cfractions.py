@@ -32,6 +32,9 @@ class CFraction(Complex):
             return self.imag == 0 and self.real == other
         return self.imag == other.imag and self.real == other.real
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __add__(self, other):
         return CFraction(self.real+other.real, self.imag+other.imag)
 
@@ -80,10 +83,13 @@ class CFraction(Complex):
         return a.__pow__(power)
 
     def __truediv__(self, other):
-        return self.__mul__(other ** -1)
+        if isinstance(other, CFraction):
+            return CFraction(Fraction((self.real*other.real + self.imag*other.imag), other.real**2 + other.imag**2),
+                             Fraction((self.imag*other.real - self.real*other.imag), other.real**2 + other.imag**2))
+        return CFraction(self.real / other, self.imag / other)
 
     def __rtruediv__(self, other):
-        return other.__mul__(self ** -1)
+        return other.__truediv__(self)
 
     def __str__(self):
         return str(self.real) + ("+" if self.imag >= 0 else "-") + str(abs(self.imag)) + "j"
