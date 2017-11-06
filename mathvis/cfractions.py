@@ -6,7 +6,7 @@ operations.
 
 When accuracy is lost due to conversion to float in order to perform an operation, \
 the result is converted back into a CFraction instance before returning. Of course \
-this doesn't recovery any accuracy but the type stays the same.
+this doesn't recover any accuracy but the type stays the same.
 
 Accuracy is not preserved during the following computations:
     - __abs__(), magnitude implemented as sqrt(a**2 + b**2)
