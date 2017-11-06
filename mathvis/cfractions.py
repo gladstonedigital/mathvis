@@ -126,25 +126,22 @@ class CFraction(Complex):
                     rn, rd = (a.real.numerator, a.real.denominator)
                     jn, jd = (a.imag.numerator, a.imag.denominator)
                     new_denominator = rn**2 * jd**2 + rd**2 * jn**2
-                    return pow(CFraction(_Fraction(rd * rn * jd**2, new_denominator),
-                                         -1 * _Fraction(rd**2 * jn * jd, new_denominator)
-                                         ), abs(power))
+                    return (CFraction(_Fraction(rd * rn * jd**2, new_denominator), -1 * _Fraction(rd**2 * jn * jd, new_denominator)))**abs(power)
 
             else: # non-integer exponents use
                 theta = math.atan(_Fraction(a.imag, a.real))
                 return CFraction(abs(a)**power * math.cos(power*theta), abs(a)**power * math.sin(power*theta))
 
-        elif isinstance(power, CFraction):
-            if power.imag == 0: # CFraction power but actually real number
+        elif isinstance(power, Complex):
+            if power.imag == 0 and isinstance(power.real, Rational): # CFraction power but actually real number
                 return a**power.real
 
             # use built-in complex power code
             z = complex(a)**complex(power)
             return CFraction(z.real, z.imag)
 
-        else: # power is complex or irrational
-            z = complex(a)**power
-            return CFraction(z.real, z.imag)
+        else:
+            raise TypeError("unsupported operand type(s) for ** or pow(): '{}' and '{}'".format(a.__class__.__name__, power.__class__.__name__))
 
     def __rpow__(power, a):
         return a.__pow__(power)
