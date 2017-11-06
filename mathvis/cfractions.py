@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-from fractions import Fraction
-from numbers import Complex, Rational, Real
-from math import sqrt, atan, cos, sin
-
 """
 Implementation of complex numbers (a+b*j) where the real and imaginary components \
 are represented as Fraction instances to preserve accuracy during most mathematical \
@@ -23,8 +19,14 @@ Accuracy is not preserved during the following computations:
     - CFraction raised to a fractional power
 """
 
+from fractions import Fraction
+from functools import reduce
+from math import sqrt, atan, cos, sin
+from numbers import Complex, Rational, Real
+from operator import mul
+
 class CFraction(Complex):
-    """Store complex number of the form (a+b*j), where a and b are Fraction instances."""
+    """Implement complex number of the form (a+b*j), where a and b are stored as Fraction instances."""
 
     def __init__(self, real, imag=0):
         self._real = Fraction(real)
@@ -90,11 +92,7 @@ class CFraction(Complex):
             if power.denominator == 1:
                 power = power.numerator
                 if power >= 0:
-                    zn = CFraction(1)
-                    while power > 0:
-                        zn *= a
-                        power -= 1
-                    return zn
+                    return reduce(mul, (a for _ in range(power)), CFraction(1))
                 elif power < 0:
                     new_denominator = a.real.numerator**2*a.imag.denominator**2 + a.real.denominator**2*a.imag.numerator**2
                     return CFraction(Fraction((a.real.denominator*a.real.numerator*a.imag.denominator**2), new_denominator),
