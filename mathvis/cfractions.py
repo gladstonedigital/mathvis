@@ -128,12 +128,12 @@ class CFraction(Complex):
                     new_denominator = rn**2 * jd**2 + rd**2 * jn**2
                     return (CFraction(_Fraction(rd * rn * jd**2, new_denominator), -1 * _Fraction(rd**2 * jn * jd, new_denominator)))**abs(power)
 
-            else: # non-integer exponents use
+            else: # positive non-integer exponents use
                 theta = math.atan(_Fraction(a.imag, a.real))
                 return CFraction(abs(a)**power * math.cos(power*theta), abs(a)**power * math.sin(power*theta))
 
         elif isinstance(power, Complex):
-            if power.imag == 0 and isinstance(power.real, Rational): # CFraction power but actually real number
+            if power.imag == 0 and isinstance(power.real, Rational) and a.real >= 0: # CFraction power but actually real number
                 return a**power.real
 
             # use built-in complex power code
