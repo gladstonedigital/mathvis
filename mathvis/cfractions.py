@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-Implementation of complex numbers (a+b*j) where the real and imaginary components \
+"""Implementation of complex numbers (a+b*j) where the real and imaginary components \
 are represented as Fraction instances to preserve accuracy during most mathematical \
 operations.
 
@@ -17,19 +16,19 @@ Accuracy is not preserved during the following computations:
     - math operations involving a CFraction and most floating point numbers
         certain floats are able to be converted to Fractions correctly but most aren't
     - CFraction raised to a fractional power
+
+Aside from the use of the Fraction class to store values, this class attempts to \
+behave as closely as possible to the built-in complex() class.
 """
 
+import math
+import operator
 from fractions import Fraction
 from functools import reduce
-from math import sqrt, atan, cos, sin
 from numbers import Complex, Rational, Real
-from operator import mul
 
 class _Fraction(Fraction):
     """Extend Fraction to override __repr__, to match functionality of complex() in the interpreter"""
-
-    def __new__(*args, **kwargs):
-        return Fraction.__new__(*args, **kwargs)
 
     def __repr__(self):
         return self.__str__()
@@ -39,7 +38,7 @@ class CFraction(Complex):
 
     def __init__(self, real, imag=0):
         """Coerce real and imaginary components to fractions"""
-        if isinstance(real, Complex):
+        if isinstance(real, Complex) and imag == 0:
             real, imag = (real.real, real.imag)
         self._real = _Fraction(real)
         self._imag = _Fraction(imag)
@@ -66,7 +65,7 @@ class CFraction(Complex):
                          self.imag.limit_denominator(max_denominator))
 
 # Comparison operators
-   def __eq__(self, other):
+    def __eq__(self, other):
         """Check equality with CFractions or other types"""
         if isinstance(other, Real):
             return self.imag == 0 and self.real == other
@@ -78,7 +77,7 @@ class CFraction(Complex):
 # Unary operators
     def __abs__(self):
         """Return magnitude of complex number sqrt(a**2 + b**2)"""
-        return _Fraction(sqrt(self.real**2 + self.imag**2))
+        return _Fraction(math.sqrt(self.real**2 + self.imag**2))
 
     def __neg__(self):
         return CFraction(_Fraction(-1 * self.real), _Fraction(-1 * self.imag))
@@ -122,16 +121,18 @@ class CFraction(Complex):
                 # this compensates just in case the numerator and denominator can vary in sign
                 power = abs(power.numerator) if power >= 0 else -1 * abs(power.numerator)
                 if power >= 0: # for positive and zero powers, just multiply repeatedly
-                    return reduce(mul, (a for _ in range(power)), CFraction(1))
+                    return reduce(operator.mul, (a for _ in range(power)), CFraction(1))
                 elif power < 0: # for negative exponents, invert fraction then raise to positive power
-                    new_denominator = a.real.numerator**2 * a.imag.denominator**2 + a.real.denominator**2 * a.imag.numerator**2
-                    return pow(CFraction(_Fraction((a.real.denominator * a.real.numerator * a.imag.denominator**2), new_denominator),
-                                         -1 * _Fraction((a.real.denominator**2 * a.imag.numerator * a.imag.denominator), new_denominator)),
-                               abs(power))
+                    rn, rd = (a.real.numerator, a.real.denominator)
+                    jn, jd = (a.imag.numerator, a.imag.denominator)
+                    new_denominator = rn**2 * jd**2 + rd**2 * jn**2
+                    return pow(CFraction(_Fraction(rd * rn * jd**2, new_denominator),
+                                         -1 * _Fraction(rd**2 * jn * jd, new_denominator)
+                                         ), abs(power))
 
             else: # non-integer exponents use
-                theta = atan(_Fraction(a.imag, a.real))
-                return CFraction(abs(a)**power * cos(power*theta), abs(a)**power * sin(power*theta))
+                theta = math.atan(_Fraction(a.imag, a.real))
+                return CFraction(abs(a)**power * math.cos(power*theta), abs(a)**power * math.sin(power*theta))
 
         elif isinstance(power, CFraction):
             if power.imag == 0: # CFraction power but actually real number
@@ -150,7 +151,9 @@ class CFraction(Complex):
 
 # Conversions
     def __str__(self):
-        """(a+bj) or (a-bj)"""
+        """(a+bj) or (a-bj) if nonzero real component else bj"""
+        if self.real == 0:
+            return str(self.imag) + "j"
         return "(" + str(self.real) + ("+" if self.imag >= 0 else "-") + str(abs(self.imag)) + "j)"
 
     def __repr__(self):
