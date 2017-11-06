@@ -41,19 +41,24 @@ class CFraction(Complex):
         return self._imag
 
     def conjugate(self):
+        """Return complex conjugate (negated imaginary component)"""
         return CFraction(self.real, -1*self.imag)
 
     def limit_denominator(self, max_denominator=1000000):
+        """Limit length of fraction at the cost of some accuracy"""
         return CFraction(self.real.limit_denominator(max_denominator),
                          self.imag.limit_denominator(max_denominator))
 
     def __abs__(self):
+        """Return magnitude of complex number sqrt(a**2 + b**2)"""
         return Fraction(sqrt(self.real**2 + self.imag**2))
 
     def __complex__(self):
+        """Convert to built-in complex type"""
         return complex(self.real, self.imag)
 
     def __eq__(self, other):
+        """Check equality with other CFractions or other types"""
         if isinstance(other, Real):
             return self.imag == 0 and self.real == other
         return self.imag == other.imag and self.real == other.real
@@ -80,6 +85,7 @@ class CFraction(Complex):
         return self.__mul__(other)
 
     def __pow__(a, power):
+        """Raise CFraction to power 'power'. 'power' can be Rational, CFraction, or other"""
         if isinstance(power, Rational):
             if power.denominator == 1:
                 power = power.numerator
@@ -98,11 +104,11 @@ class CFraction(Complex):
                 return CFraction(abs(a)**power * cos(power*theta), abs(a)**power * sin(power*theta))
         elif isinstance(power, CFraction):
             if power.imag == 0:
-                return a ** power.real
-            z = complex(a) ** complex(power)
+                return a**power.real
+            z = complex(a)**complex(power)
             return CFraction(z.real, z.imag)
         else:
-            z = complex(a) ** power
+            z = complex(a)**power
             return CFraction(z.real, z.imag)
 
     def __rpow__(power, a):
