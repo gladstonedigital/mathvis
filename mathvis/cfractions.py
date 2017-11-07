@@ -122,8 +122,8 @@ class CFraction(Complex):
     def __pow__(a, power):
         """Raise CFraction to power 'power'. 'power' can be Rational, CFraction, or other"""
 
-        if a == 0 and power < 0:
-            raise ZeroDivisionError("0 cannot be raised to a negative power")
+        if a == 0 and (power.imag != 0 or power.real < 0):
+            raise ZeroDivisionError("0 to a negative or complex power")
 
         if isinstance(power, Rational): # Rational(Real) exponents
             if power.denominator == 1: # integer exponents
