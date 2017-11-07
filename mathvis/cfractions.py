@@ -137,8 +137,8 @@ class CFraction(Complex):
         if other == 0:
             raise ZeroDivisionError("complex division by zero")
 
-        return CFraction((self.real * other.real + self.imag * other.imag) / (other.real**2 + other.imag**2),
-                         (self.imag * other.real - self.real * other.imag) / (other.real**2 + other.imag**2))
+        return CFraction((self.real * other.real + self.imag * other.imag, other.real**2 + other.imag**2),
+                         (self.imag * other.real - self.real * other.imag, other.real**2 + other.imag**2))
 
     def __rtruediv__(self, other):
         return CFraction(other).__truediv__(self)
@@ -178,9 +178,7 @@ class CFraction(Complex):
                     rn, rd = (a.real.numerator, a.real.denominator)
                     jn, jd = (a.imag.numerator, a.imag.denominator)
                     new_d = rn**2 * jd**2 + rd**2 * jn**2
-                    return (CFraction(_Fraction(rd * rn * jd**2, new_d),
-                                      -1 * _Fraction(rd**2 * jn * jd, new_d))
-                                      )**abs(power)
+                    return CFraction((rd * rn * jd**2, new_d), (-1 * rd**2 * jn * jd, new_d))**abs(power)
 
             else: # positive non-integer exponents use
                 theta = math.atan2(a.imag, a.real)
