@@ -85,6 +85,17 @@ class CFraction(Complex):
     def __pos__(a):
         return CFraction(_Fraction(a.real), _Fraction(a.imag))
 
+    def __hash__(self):
+        """Lifted this algorithm from implementation of built-in complex().__hash__ in complex_hash(PyComplexObject*) in Objects/complexobject.c"""
+        hashreal = hash(self.real)
+        hashimag = hash(self.imag)
+
+        if hashreal == -1 or hashimag == -1:
+            return -1
+
+        combined = hashreal + 1000003 * hashimag
+        return -2 if combined == -1 else combined
+
 # Binary operators
     def __add__(self, other):
         return CFraction(self.real+_Fraction(other.real), self.imag+_Fraction(other.imag))
