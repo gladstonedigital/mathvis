@@ -10,3 +10,6 @@ complex:
 freeze:
 	pip3 freeze | grep -v "pkg-resources" > requirements.txt
 
+test:
+	python3 -m pytest
+
