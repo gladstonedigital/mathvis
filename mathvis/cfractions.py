@@ -24,6 +24,7 @@ behave as closely as possible to the built-in complex class.
 import copy
 import math
 import operator
+from collections.abc import Iterable
 from fractions import Fraction
 from functools import reduce
 from numbers import Complex, Rational, Real
@@ -44,8 +45,9 @@ class CFraction(Complex):
         """Coerce real and imaginary components to fractions"""
         if isinstance(real, Complex) and imag == 0:
             real, imag = (real.real, real.imag)
-        self._real = _Fraction(real)
-        self._imag = _Fraction(imag)
+        # Support passing tuples as (numerator,denominator) pairs
+        self._real = _Fraction(*real) if isinstance(real, Iterable) and len(real) == 2 else _Fraction(real)
+        self._imag = _Fraction(*imag) if isinstance(imag, Iterable) and len(imag) == 2 else _Fraction(imag)
 
 # Properties
     @property
@@ -147,6 +149,12 @@ class CFraction(Complex):
     def __rfloordiv__(self, other):
         raise TypeError("can't take floor of complex number.")
 
+    def __divmod__(self, other):
+        raise TypeError("can't take floor or mod of complex number.")
+
+    def __rdivmod__(self, other):
+        raise TypeError("can't take floor or mod of complex number.")
+
     def __pow__(a, power):
         """Raise CFraction to power 'power'. 'power' can be Rational, CFraction, or other"""
 
@@ -205,7 +213,4 @@ class CFraction(Complex):
 
     def __int__(self):
         raise TypeError("can't convert CFraction to int")
-
-    def __divmod__(self):
-        raise TypeError("can't take floor or mod of complex number.")
 
