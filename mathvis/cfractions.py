@@ -21,6 +21,7 @@ Aside from the use of the Fraction class to store values, this class attempts to
 behave as closely as possible to the built-in complex() class.
 """
 
+import copy
 import math
 import operator
 from fractions import Fraction
@@ -36,7 +37,7 @@ class _Fraction(Fraction):
 class CFraction(Complex):
     """Implement complex number of the form (a+b*j), where a and b are stored as Fraction instances."""
 
-    def __init__(self, real, imag=0):
+    def __init__(self, real=0, imag=0):
         """Coerce real and imaginary components to fractions"""
         if isinstance(real, Complex) and imag == 0:
             real, imag = (real.real, real.imag)
@@ -82,8 +83,8 @@ class CFraction(Complex):
     def __neg__(self):
         return CFraction(_Fraction(-1 * self.real), _Fraction(-1 * self.imag))
 
-    def __pos__(a):
-        return CFraction(_Fraction(a.real), _Fraction(a.imag))
+    def __pos__(self):
+        return CFraction(_Fraction(self.real), _Fraction(self.imag))
 
     def __hash__(self):
         """Lifted this algorithm from implementation of built-in complex().__hash__ in complex_hash(PyComplexObject*) in Objects/complexobject.c"""
@@ -96,9 +97,21 @@ class CFraction(Complex):
         combined = hashreal + 1000003 * hashimag
         return -2 if combined == -1 else combined
 
+    def __reduce__(self):
+        """Support for pickle"""
+        return (self.__class__, (self.real, self.imag))
+
+    def __copy__(self):
+        """Support for copy module"""
+        return self.__class__(self.real, self.imag)
+
+    def __deepcopy__(self, memo):
+        """Support for copy module"""
+        return self.__class__(copy.deepcopy(self.real, memo), copy.deepcopy(self.imag, memo))
+
 # Binary operators
     def __add__(self, other):
-        return CFraction(self.real+_Fraction(other.real), self.imag+_Fraction(other.imag))
+        return CFraction(self.real + _Fraction(other.real), self.imag + _Fraction(other.imag))
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -111,8 +124,8 @@ class CFraction(Complex):
 
     def __truediv__(self, other):
         if isinstance(other, CFraction):
-            return CFraction(_Fraction((self.real*other.real + self.imag*other.imag), other.real**2 + other.imag**2),
-                             _Fraction((self.imag*other.real - self.real*other.imag), other.real**2 + other.imag**2))
+            return CFraction(_Fraction((self.real * other.real + self.imag * other.imag), other.real**2 + other.imag**2),
+                             _Fraction((self.imag * other.real - self.real * other.imag), other.real**2 + other.imag**2))
         return CFraction(self.real / other, self.imag / other)
 
     def __rtruediv__(self, other):
