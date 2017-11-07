@@ -113,8 +113,18 @@ class CFraction(Complex):
     def __rdiv__(self, other):
         return CFraction(other).__truediv__(self)
 
+    def __floordiv__(self, other):
+        raise TypeError("can't take floor of complex number.")
+
+    def __rfloordiv__(self, other):
+        raise TypeError("can't take floor of complex number.")
+
     def __pow__(a, power):
         """Raise CFraction to power 'power'. 'power' can be Rational, CFraction, or other"""
+
+        if a == 0 and power < 0:
+            raise ZeroDivisionError("0 cannot be raised to a negative power")
+
         if isinstance(power, Rational): # Rational(Real) exponents
             if power.denominator == 1: # integer exponents
                 # I think Fraction always stores the sign in the numerator, but I'm not 100% sure.
@@ -125,18 +135,20 @@ class CFraction(Complex):
                 elif power < 0: # for negative exponents, invert fraction then raise to positive power
                     rn, rd = (a.real.numerator, a.real.denominator)
                     jn, jd = (a.imag.numerator, a.imag.denominator)
-                    new_denominator = rn**2 * jd**2 + rd**2 * jn**2
-                    return (CFraction(_Fraction(rd * rn * jd**2, new_denominator), -1 * _Fraction(rd**2 * jn * jd, new_denominator)))**abs(power)
+                    new_d = rn**2 * jd**2 + rd**2 * jn**2
+                    return (CFraction(_Fraction(rd * rn * jd**2, new_d),
+                                      -1 * _Fraction(rd**2 * jn * jd, new_d))
+                                      )**abs(power)
 
             else: # positive non-integer exponents use
-                theta = math.atan(_Fraction(a.imag, a.real))
+                theta = math.atan2(a.imag, a.real)
                 return CFraction(abs(a)**power * math.cos(power*theta), abs(a)**power * math.sin(power*theta))
 
         elif isinstance(power, Complex):
-            if power.imag == 0 and isinstance(power.real, Rational) and a.real >= 0: # CFraction power but actually real number
+            if power.imag == 0 and isinstance(power.real, Rational) and a.real >= 0: # Complex power but actually real number
                 return a**power.real
 
-            # use built-in complex power code
+            # use built-in complex power code for complex or irrational powers
             z = complex(a)**complex(power)
             return CFraction(z.real, z.imag)
 
