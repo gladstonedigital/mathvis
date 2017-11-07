@@ -121,6 +121,12 @@ class CFraction(Complex):
     def __radd__(self, other):
         return self.__add__(other)
 
+    def __sub__(self, other):
+        return self.__add__(-1 * other)
+
+    def __rsub__(self, other):
+        return (-1 * self).__add__(other)
+
     def __mul__(self, other):
         return CFraction(self.real * other.real - self.imag * other.imag, self.real * other.imag + self.imag * other.real)
 
