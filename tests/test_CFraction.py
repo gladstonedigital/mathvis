@@ -1,5 +1,31 @@
 from mathvis.cfractions import CFraction
 
+def test_constructor():
+    pass
+
+def test_eq():
+    pass
+
+def test_neg_pos():
+    pass
+
+def test_addition():
+    pass
+
+def test_hash():
+    assert hash(CFraction((1,2), 12)) == hash(complex(0.5, 12))
+
+def test_division():
+    cf = CFraction(21, -8) / CFraction(4,3)
+    cm = complex(21, -8) / (4+3j)
+    assert float(cf.real) == cm.real and float(cf.imag) == cm.imag
+
+def test_complex_powers():
+    pass
+
+def test_negative_powers():
+    pass
+
 def test_rational_powers():
     assert CFraction(1)**0 == complex(1)**0
     assert CFraction(1)**8 == complex(1)**8
