@@ -35,7 +35,10 @@ class _Fraction(Fraction):
         return self.__str__()
 
 class CFraction(Complex):
-    """Implement complex number of the form (a+b*j), where a and b are stored as Fraction instances."""
+    """CFraction(real[, imag]) -> complex number with components stored as Fraction instances.
+
+    Create a complex number from a real part and an optional imaginary part. CFraction is interoperable with the built-in complex class, but of course this loses the benefit of Fraction components.
+    """
 
     def __init__(self, real=0, imag=0):
         """Coerce real and imaginary components to fractions"""
