@@ -205,11 +205,3 @@ class CFraction(Complex):
     def __divmod__(self):
         raise TypeError("can't take floor or mod of complex number.")
 
-def main():
-    z = CFraction(2,3)
-    print(z**2)
-    print(z**-2)
-
-if __name__ == "__main__":
-    main()
-
