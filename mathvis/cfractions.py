@@ -15,10 +15,10 @@ Accuracy is not preserved during the following computations:
         (becomes float during calculation)
     - math operations involving a CFraction and most floating point numbers
         certain floats are able to be converted to Fractions correctly but most aren't
-    - CFraction raised to a fractional power
+    - CFraction raised to a non-integer power
 
 Aside from the use of the Fraction class to store values, this class attempts to \
-behave as closely as possible to the built-in complex() class.
+behave as closely as possible to the built-in complex class.
 """
 
 import copy
@@ -84,10 +84,10 @@ class CFraction(Complex):
         return _Fraction(math.sqrt(self.real**2 + self.imag**2))
 
     def __neg__(self):
-        return CFraction(_Fraction(-1 * self.real), _Fraction(-1 * self.imag))
+        return CFraction(-1 * self.real, -1 * self.imag)
 
     def __pos__(self):
-        return CFraction(_Fraction(self.real), _Fraction(self.imag))
+        return CFraction(self.real, self.imag)
 
     def __hash__(self):
         """Lifted this algorithm from implementation of built-in complex().__hash__ in complex_hash(PyComplexObject*) in Objects/complexobject.c"""
@@ -114,7 +114,7 @@ class CFraction(Complex):
 
 # Binary operators
     def __add__(self, other):
-        return CFraction(self.real + _Fraction(other.real), self.imag + _Fraction(other.imag))
+        return CFraction(self.real + other.real, self.imag + other.imag)
 
     def __radd__(self, other):
         return self.__add__(other)
@@ -126,10 +126,11 @@ class CFraction(Complex):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        if isinstance(other, CFraction):
-            return CFraction(_Fraction((self.real * other.real + self.imag * other.imag), other.real**2 + other.imag**2),
-                             _Fraction((self.imag * other.real - self.real * other.imag), other.real**2 + other.imag**2))
-        return CFraction(self.real / other, self.imag / other)
+        if other == 0:
+            raise ZeroDivisionError("complex division by zero")
+
+        return CFraction((self.real * other.real + self.imag * other.imag) / (other.real**2 + other.imag**2),
+                         (self.imag * other.real - self.real * other.imag) / (other.real**2 + other.imag**2))
 
     def __rtruediv__(self, other):
         return CFraction(other).__truediv__(self)
