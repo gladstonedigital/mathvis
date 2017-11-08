@@ -46,8 +46,8 @@ class CFraction(Complex):
         if isinstance(real, Complex) and imag == 0:
             real, imag = (real.real, real.imag)
         # Support passing tuples as (numerator,denominator) pairs
-        self._real = _Fraction(*real) if isinstance(real, Iterable) and len(real) == 2 else _Fraction(real)
-        self._imag = _Fraction(*imag) if isinstance(imag, Iterable) and len(imag) == 2 else _Fraction(imag)
+        self._real = _Fraction(*real if isinstance(real, Iterable) and len(real) == 2 else real)
+        self._imag = _Fraction(*imag if isinstance(imag, Iterable) and len(imag) == 2 else imag)
 
 # Properties
     @property
