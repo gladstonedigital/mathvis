@@ -73,6 +73,9 @@ class CFraction(Complex):
 # Comparison operators
     def __eq__(self, other):
         """Check equality with CFractions or other types"""
+        if other is None:
+            return False
+
         if isinstance(other, Real):
             return self.imag == 0 and self.real == other
         return self.imag == other.imag and self.real == other.real
