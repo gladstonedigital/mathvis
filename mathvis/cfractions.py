@@ -180,7 +180,7 @@ class CFraction(Complex):
                     new_d = rn**2 * jd**2 + rd**2 * jn**2
                     return CFraction((rd * rn * jd**2, new_d), (-1 * rd**2 * jn * jd, new_d))**abs(power)
 
-            else: # positive non-integer exponents use
+            else: # non-integer exponents use this https://stackoverflow.com/questions/3099403/calculating-complex-numbers-with-rational-exponents
                 theta = math.atan2(a.imag, a.real)
                 return CFraction(abs(a)**power * math.cos(power*theta), abs(a)**power * math.sin(power*theta))
 
@@ -189,8 +189,7 @@ class CFraction(Complex):
                 return a**power.real
 
             # use built-in complex power code for complex or irrational powers
-            z = complex(a)**complex(power)
-            return CFraction(z.real, z.imag)
+            return CFraction(complex(a)**complex(power))
 
         else:
             raise TypeError("unsupported operand type(s) for ** or pow(): '{}' and '{}'".format(a.__class__.__name__, power.__class__.__name__))
