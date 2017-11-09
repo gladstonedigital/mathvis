@@ -5,6 +5,7 @@ import math
 import numpy
 import matplotlib.pyplot as plt
 from fractions import Fraction
+from cfractions import CFraction
 
 description = """
 Factors trinomials from (ax^2 + bx + c) to (px + q)(rx + s)
@@ -26,11 +27,14 @@ class Binomial():
         return not self.__eq__(other)
 
     def __str__(self):
-        a_disp = (self.a if display_force_exact or self.a.denominator <= display_max_denominator else round(float(self.a), display_max_precision))
-        prefix = ("(%sx" % ("" if self.a == 1 else ("-" if self.a == -1 else a_disp)))
-        b_disp = (self.b if display_force_exact or self.b.denominator <= display_max_denominator else round(float(self.b), display_max_precision))
-        suffix = (")" if self.b == 0 else ((" + %s)" % b_disp) if b_disp > 0 else " - %s)" % (-1 * b_disp)))
-        return prefix + suffix
+        if not isinstance(self.a, CFraction) and not isinstance(self.b, CFraction):
+            a_disp = (self.a if display_force_exact or self.a.denominator <= display_max_denominator else round(float(self.a), display_max_precision))
+            prefix = ("(%sx" % ("" if self.a == 1 else ("-" if self.a == -1 else a_disp)))
+            b_disp = (self.b if display_force_exact or self.b.denominator <= display_max_denominator else round(float(self.b), display_max_precision))
+            suffix = (")" if self.b == 0 else ((" + %s)" % b_disp) if b_disp > 0 else " - %s)" % (-1 * b_disp)))
+            return prefix + suffix
+        else:
+            return "({}x + {})".format(self.a, self.b)
 
     def evaluate(self, x):
         return self.a*x + self.b
@@ -65,7 +69,7 @@ class FactorPair():
         return not self.__eq__(other)
 
     def __str__(self):
-        return "%s%s" % tuple(self)
+        return "%s · %s" % tuple(self)
 
     def expand(self):
         return Trinomial(self.p*self.r, self.p*self.s + self.q*self.r, self.q*self.s)
@@ -102,11 +106,9 @@ class Trinomial():
         roots = []
         discriminant = Fraction(self.b**2 - (4 * self.a * self.c))
         if discriminant < 0: # complex solutions
-            self.radical = None
-            return None
-            #self.radical = complex(0, math.sqrt(-1 * discriminant))
-            #roots.append((-1 * self.b + self.radical) / (2 * self.a))
-            #roots.append((-1 * self.b - self.radical) / (2 * self.a))
+            self.radical = CFraction(0, math.sqrt(-1 * discriminant))
+            roots.append((-1 * self.b + self.radical) / (2 * self.a))
+            roots.append((-1 * self.b - self.radical) / (2 * self.a))
         else:
             self.radical = Fraction(math.sqrt(discriminant))
             if self.a == 0: # linear function
@@ -190,11 +192,12 @@ def main():
         args.view_xrange = [-10, 10]
 
     f = Trinomial(args.a, args.b, args.c)
-    if f.roots is None:
-        print("%s has no real roots" % f)
-    else:
-        print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
-        for root in f.roots:
+
+    print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
+    for root in f.roots:
+        if isinstance(root, CFraction):
+            print("    x = %s" % str(root))
+        else:
             print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
 
     factors = []
