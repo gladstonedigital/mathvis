@@ -95,14 +95,6 @@ class Trinomial():
         return self.a*(x**2) + self.b*x + self.c
 
     def find_roots(self):
-        """
-        try:
-            self.radical = Fraction(math.sqrt(self.b**2 - (4 * self.a * self.c)))
-        except:
-            self.radical = None
-            return None
-        """
-
         roots = []
         discriminant = Fraction(self.b**2 - (4 * self.a * self.c))
         if discriminant < 0: # complex solutions
