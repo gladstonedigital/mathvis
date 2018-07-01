@@ -15,7 +15,7 @@ display_max_denominator = 9999
 display_max_precision = 4
 display_force_exact = False
 
-class Binomial():
+class Line():
     def __init__(self, a, b):
         self.a = a
         self.b = b
@@ -34,7 +34,8 @@ class Binomial():
             suffix = (")" if self.b == 0 else ((" + %s)" % b_disp) if b_disp > 0 else " - %s)" % (-1 * b_disp)))
             return prefix + suffix
         else:
-            return "({}x + {})".format(self.a, self.b)
+            return "({}x + {})".format("" if self.a == 1 else ("-" if self.a == -1 else (self.a if display_force_exact or self.a.denominator <= display_max_denominator else round(float(self.a), display_max_precision))),
+                                       format_cfraction(self.b))
 
     def evaluate(self, x):
         return self.a*x + self.b
@@ -49,8 +50,8 @@ class FactorPair():
             self.s = b2.b
         else:
             self.binomials = []
-            self.binomials.append(Binomial(p, q))
-            self.binomials.append(Binomial(r, s))
+            self.binomials.append(Line(p, q))
+            self.binomials.append(Line(r, s))
             self.p = p
             self.q = q
             self.r = r
@@ -72,9 +73,9 @@ class FactorPair():
         return "%s · %s" % tuple(self)
 
     def expand(self):
-        return Trinomial(self.p*self.r, self.p*self.s + self.q*self.r, self.q*self.s)
+        return Quadratic(self.p*self.r, self.p*self.s + self.q*self.r, self.q*self.s)
 
-class Trinomial():
+class Quadratic():
     def __init__(self, a, b, c):
         self.factor_pairs = {}
         self.a = Fraction(a)
@@ -106,11 +107,8 @@ class Trinomial():
             if self.a == 0: # linear function
                 roots.append(-1 * self.c / self.b)
             else: # quadratic function
-                if self.radical == 0:
-                    roots.append(-1 * self.b / (2 * self.a))
-                else:
-                    roots.append((-1 * self.b + self.radical) / (2 * self.a))
-                    roots.append((-1 * self.b - self.radical) / (2 * self.a))
+                roots.append((-1 * self.b + self.radical) / (2 * self.a))
+                roots.append((-1 * self.b - self.radical) / (2 * self.a))
 
         return roots
 
@@ -156,6 +154,11 @@ class Trinomial():
 
         plt.show()
 
+def format_cfraction(c):
+    return "({} {} {}j)".format(c.real if display_force_exact or c.real.denominator <= display_max_denominator else round(float(c.real), display_max_precision),
+                                "+" if c.imag >= 0 else "-",
+                                abs(c.imag) if display_force_exact or c.imag.denominator <= display_max_denominator else round(float(abs(c.imag)), display_max_precision))
+
 def main():
     global display_force_exact, display_max_precision
 
@@ -183,12 +186,16 @@ def main():
     if args.view_xrange is None:
         args.view_xrange = [-10, 10]
 
-    f = Trinomial(args.a, args.b, args.c)
+    try:
+        f = Quadratic(args.a, args.b, args.c)
+    except Exception as e:
+        print("{}: {}".format(type(e).__name__, e))
+        return
 
     print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
     for root in f.roots:
         if isinstance(root, CFraction):
-            print("    x = %s" % str(root))
+            print("    x = %s" % format_cfraction(root))
         else:
             print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
 
