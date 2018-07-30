@@ -87,6 +87,7 @@ class App(QWidget):
         self.plotcanvas.plot(x, f.evaluate(x), 'f(x) = ' + str(f))
         for pair in f.factor_pairs.values():
             for line in pair.binomials:
+                #pass
                 self.plotcanvas.plot(x, line.evaluate(x), linewidth=0.4)
 
 class PlotCanvas(FigureCanvas):
