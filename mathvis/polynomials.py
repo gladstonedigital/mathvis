@@ -17,10 +17,27 @@ display_force_exact = False
 
 class Polynomial():
     def __init__(self, *coefficients):
-        self.degree = len(coefficients)
+        self.degree = len(coefficients) - 1
         print("Creating degree %s polynomial" % self.degree)
         self.coefficients = [Fraction(a) for a in coefficients]
-        self.factors = []
+        self.factor_sets = []
+
+    def next_factor(self):
+        pass
+
+    def evaluate(self, x):
+        y = sum(self.coefficients[self.degree-i]*x**i for i in range(self.degree, -1, -1))
+        print(x, y)
+        return y
+
+    def plot(self, low, high):
+        x = numpy.linspace(low, high, (high - low) * 10)
+        y = self.evaluate(x)
+        fig, ax = plt.subplots()
+        ax.plot(x, y)
+        axis_y = numpy.linspace(0, 0, len(x))
+        ax.plot(x, axis_y)
+        plt.show()
 
 class Line():
     def __init__(self, a, b):
@@ -204,6 +221,7 @@ def main():
             f = Quadratic(*args.coefficients)
         else:
             f = Polynomial(*args.coefficients)
+            f.plot(args.view_xrange[0], args.view_xrange[1])
     except Exception as e:
         print("{}: {}".format(type(e).__name__, e))
         return
