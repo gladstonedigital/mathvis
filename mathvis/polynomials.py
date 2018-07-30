@@ -26,9 +26,7 @@ class Polynomial():
         pass
 
     def evaluate(self, x):
-        y = sum(self.coefficients[self.degree-i]*x**i for i in range(self.degree, -1, -1))
-        print(x, y)
-        return y
+        return sum(self.coefficients[self.degree-i]*x**i for i in range(self.degree, -1, -1))
 
     def plot(self, low, high):
         x = numpy.linspace(low, high, (high - low) * 10)
@@ -221,7 +219,7 @@ def main():
             f = Quadratic(*args.coefficients)
         else:
             f = Polynomial(*args.coefficients)
-            f.plot(args.view_xrange[0], args.view_xrange[1])
+            f.plot(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
     except Exception as e:
         print("{}: {}".format(type(e).__name__, e))
         return
