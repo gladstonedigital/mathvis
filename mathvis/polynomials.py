@@ -146,6 +146,8 @@ class Quadratic():
         y = self.evaluate(x)
         fig, ax = plt.subplots()
         ax.plot(x, y)
+        axis_y = numpy.linspace(0, 0, len(x))
+        ax.plot(x, axis_y)
 
         for pair in self.factor_pairs.values():
             for line in pair.binomials:
