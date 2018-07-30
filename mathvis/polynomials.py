@@ -15,6 +15,13 @@ display_max_denominator = 9999
 display_max_precision = 4
 display_force_exact = False
 
+class Polynomial():
+    def __init__(self, *coefficients):
+        self.degree = len(coefficients)
+        print("Creating degree %s polynomial" % self.degree)
+        self.coefficients = [Fraction(a) for a in coefficients]
+        self.factors = []
+
 class Line():
     def __init__(self, a, b):
         self.a = a
@@ -163,10 +170,11 @@ def main():
     global display_force_exact, display_max_precision
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("a", help="ax^2")
-    parser.add_argument("b", help="bx")
-    parser.add_argument("c", help="c")
-    parser.add_argument("factor", nargs="?", help="Coefficient p in (px + q) of factored solution")
+    #parser.add_argument("a", help="ax^2")
+    #parser.add_argument("b", help="bx")
+    #parser.add_argument("c", help="c")
+    parser.add_argument("coefficients", nargs="+", help="Coefficients of the polynomial, in order of decreasing power of x")
+    #parser.add_argument("factor", nargs="?", help="Coefficient p in (px + q) of factored solution")
     parser.add_argument("--exact", "-e", action="store_true", help="Always display exact coefficients")
     parser.add_argument("--precision", "-c", type=int, help="Precision of floating point coefficients")
     parser.add_argument("--plot", "-p", action="store_true", help="Show plot of polynomial and factors")
@@ -186,36 +194,43 @@ def main():
     if args.view_xrange is None:
         args.view_xrange = [-10, 10]
 
+    if len(args.coefficients) < 3:
+        print("Polynomial must have at least 3 terms")
+        return
     try:
-        f = Quadratic(args.a, args.b, args.c)
+        if len(args.coefficients) == 3:
+            f = Quadratic(*args.coefficients)
+        else:
+            f = Polynomial(*args.coefficients)
     except Exception as e:
         print("{}: {}".format(type(e).__name__, e))
         return
 
-    print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
-    for root in f.roots:
-        if isinstance(root, CFraction):
-            print("    x = %s" % format_cfraction(root))
-        else:
-            print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
 
-    factors = []
-    if args.factor is not None:
-        factors.append(args.factor)
-    else:
-        for p in numpy.arange(Fraction(args.factor_range[0]), Fraction(args.factor_range[1]) + 1, Fraction(args.factor_step)):
-            factors.append(p)
+    #print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
+    #for root in f.roots:
+    #    if isinstance(root, CFraction):
+    #        print("    x = %s" % format_cfraction(root))
+    #    else:
+    #        print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
 
-    print("")
-    if f.radical is None:
-        print("%s has no factor pairs in the real space" % f)
-    else:
-        print("Some of the possible factorizations of %s:" % f)
-        for p in factors:
-            print(f.factor(p))
+    #factors = []
+    #if args.factor is not None:
+    #    factors.append(args.factor)
+    #else:
+    #    for p in numpy.arange(Fraction(args.factor_range[0]), Fraction(args.factor_range[1]) + 1, Fraction(args.factor_step)):
+    #        factors.append(p)
 
-    if args.plot:
-        f.plot_all(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
+    #print("")
+    #if f.radical is None:
+    #    print("%s has no factor pairs in the real space" % f)
+    #else:
+    #    print("Some of the possible factorizations of %s:" % f)
+    #    for p in factors:
+    #        print(f.factor(p))
+
+    #if args.plot:
+    #    f.plot_all(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
 
 if __name__ == "__main__":
     main()
