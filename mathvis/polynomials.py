@@ -281,7 +281,7 @@ def main():
             f = Quadratic(*args.coefficients)
         else:
             f = Polynomial(*args.coefficients)
-            f.factor(verbose=True)
+            f.factor()
             for factor in f.factor_sets[0]:
                 print("%s" % factor, end="")
             print()
