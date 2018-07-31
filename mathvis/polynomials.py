@@ -11,7 +11,8 @@ from itertools import chain, combinations
 from operator import mul
 
 description = """
-Factors trinomials from (ax^2 + bx + c) to (px + q)(rx + s)
+Factors quadratics from (ax^2 + bx + c) to (px + q)(rx + s).
+Also can factor higher order polynomials with no more than 2 irrational or complex roots
 """
 
 display_max_denominator = 9999
@@ -53,14 +54,13 @@ def synthetic_division(polynomial, root):
 class Polynomial():
     def __init__(self, *coefficients):
         self.degree = len(coefficients) - 1
-        print("Creating degree %s polynomial" % self.degree)
         self.coefficients = [Fraction(a) for a in coefficients]
         self.factor_sets = []
 
     def factor(self, verbose=False):
         coef = self.coefficients
         factor_set = []
-        while len(coef) > 1:
+        while len(coef) > 3:
             possible_num = sorted([Fraction(reduce(mul, num, 1)) for num in list(set(powerset(prime_factor(coef[-1]))))])
             possible_den = sorted([Fraction(reduce(mul, den, 1)) for den in list(set(powerset(prime_factor(coef[0]))))])
             possible_roots = [a * num / den for a in (1, -1) for den in possible_den for num in possible_num]
@@ -224,7 +224,7 @@ class Quadratic():
         self.factor_pairs[p] = FactorPair(p, q, r, s)
         return self.factor_pairs[p]
 
-    def plot_all(self, low, high):
+    def plot(self, low, high):
         x = numpy.linspace(low, high, (high - low) * 10)
         y = self.evaluate(x)
         fig, ax = plt.subplots()
@@ -248,11 +248,8 @@ def main():
     global display_force_exact, display_max_precision
 
     parser = argparse.ArgumentParser(description=description)
-    #parser.add_argument("a", help="ax^2")
-    #parser.add_argument("b", help="bx")
-    #parser.add_argument("c", help="c")
     parser.add_argument("coefficients", nargs="+", help="Coefficients of the polynomial, in order of decreasing power of x")
-    #parser.add_argument("factor", nargs="?", help="Coefficient p in (px + q) of factored solution")
+    parser.add_argument("--factor", "-f", help="Coefficient p in (px + q) of factored solution")
     parser.add_argument("--exact", "-e", action="store_true", help="Always display exact coefficients")
     parser.add_argument("--precision", "-c", type=int, help="Precision of floating point coefficients")
     parser.add_argument("--plot", "-p", action="store_true", help="Show plot of polynomial and factors")
@@ -281,41 +278,43 @@ def main():
             f = Quadratic(*args.coefficients)
         else:
             f = Polynomial(*args.coefficients)
-            f.factor()
-            for factor in f.factor_sets[0]:
-                print("%s" % factor, end="")
-            print()
-            if args.plot:
-                f.plot(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
     except Exception as e:
         print("{}: {}".format(type(e).__name__, e))
         return
 
 
-    #print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
-    #for root in f.roots:
-    #    if isinstance(root, CFraction):
-    #        print("    x = %s" % format_cfraction(root))
-    #    else:
-    #        print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
+    if type(f) is Quadratic:
+        print("%s has %d root%s at:" % (f, len(f.roots), "" if len(f.roots) == 1 else "s"))
+        for root in f.roots:
+            if isinstance(root, CFraction):
+                print("    x = %s" % format_cfraction(root))
+            else:
+                print("    x = %s" % (str(root) if display_force_exact or root.denominator <= display_max_denominator else str(round(float(root), display_max_precision))))
 
-    #factors = []
-    #if args.factor is not None:
-    #    factors.append(args.factor)
-    #else:
-    #    for p in numpy.arange(Fraction(args.factor_range[0]), Fraction(args.factor_range[1]) + 1, Fraction(args.factor_step)):
-    #        factors.append(p)
+        factors = []
+        if args.factor is not None:
+            factors.append(args.factor)
+        else:
+            for p in numpy.arange(Fraction(args.factor_range[0]), Fraction(args.factor_range[1]) + 1, Fraction(args.factor_step)):
+                factors.append(p)
 
-    #print("")
-    #if f.radical is None:
-    #    print("%s has no factor pairs in the real space" % f)
-    #else:
-    #    print("Some of the possible factorizations of %s:" % f)
-    #    for p in factors:
-    #        print(f.factor(p))
+        print("")
+        if f.radical is None:
+            print("%s has no factor pairs in the real space" % f)
+        else:
+            print("Some of the possible factorizations of %s:" % f)
+            for p in factors:
+                print(f.factor(p))
 
-    #if args.plot:
-    #    f.plot_all(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
+    elif type(f) is Polynomial:
+        print("Analyzing degree %s polynomial" % f.degree)
+        f.factor()
+        for factor in f.factor_sets[0]:
+            print("%s" % factor, end="")
+        print()
+
+    if args.plot:
+        f.plot(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
 
 if __name__ == "__main__":
     main()
