@@ -5,7 +5,10 @@ import math
 import numpy
 import matplotlib.pyplot as plt
 from fractions import Fraction
+from functools import reduce
 from cfractions import CFraction
+from itertools import chain, combinations
+from operator import mul
 
 description = """
 Factors trinomials from (ax^2 + bx + c) to (px + q)(rx + s)
@@ -15,6 +18,38 @@ display_max_denominator = 9999
 display_max_precision = 4
 display_force_exact = False
 
+def prime_factor(num):
+    factors = []
+    n = abs(num)
+    while n % 2 == 0:
+        factors.append(2)
+        n //= 2
+
+    i = 3
+    while i <= math.sqrt(n):
+        while n % i == 0:
+            factors.append(i)
+            n //= i
+        i += 2
+
+    if n > 2:
+        factors.append(n)
+
+    return factors
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+def synthetic_division(polynomial, root):
+    result = polynomial[0]
+    coefficients = [result]
+    for c in polynomial[1:]:
+        result = result * root + c
+        coefficients.append(result)
+    return (result, coefficients[:len(coefficients)-1])
+
 class Polynomial():
     def __init__(self, *coefficients):
         self.degree = len(coefficients) - 1
@@ -22,8 +57,34 @@ class Polynomial():
         self.coefficients = [Fraction(a) for a in coefficients]
         self.factor_sets = []
 
-    def next_factor(self):
-        pass
+    def factor(self, verbose=False):
+        coef = self.coefficients
+        factor_set = []
+        while len(coef) > 1:
+            possible_num = sorted([Fraction(reduce(mul, num, 1)) for num in list(set(powerset(prime_factor(coef[-1]))))])
+            possible_den = sorted([Fraction(reduce(mul, den, 1)) for den in list(set(powerset(prime_factor(coef[0]))))])
+            possible_roots = [a * num / den for a in (1, -1) for den in possible_den for num in possible_num]
+            root = None
+            quotient = None
+            for r in possible_roots:
+                result = synthetic_division(coef, r)
+                if result[0] == 0:
+                    root = r
+                    quotient = result[1]
+                    break
+            else:
+                print("No rational roots found")
+                break
+
+            factor_set.append(Line(1, -1*root))
+            coef = quotient
+            if verbose:
+                print("Found factor %s" % factor_set[-1])
+                print("Quotient is %s" % quotient)
+
+        if len(coef) == 3:
+            factor_set.append(Quadratic(*coef).factor(1))
+        self.factor_sets.append(factor_set)
 
     def evaluate(self, x):
         return sum(self.coefficients[self.degree-i]*x**i for i in range(self.degree, -1, -1))
@@ -214,12 +275,18 @@ def main():
     if len(args.coefficients) < 3:
         print("Polynomial must have at least 3 terms")
         return
+
     try:
         if len(args.coefficients) == 3:
             f = Quadratic(*args.coefficients)
         else:
             f = Polynomial(*args.coefficients)
-            f.plot(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
+            f.factor(verbose=True)
+            for factor in f.factor_sets[0]:
+                print("%s" % factor, end="")
+            print()
+            if args.plot:
+                f.plot(Fraction(args.view_xrange[0]), Fraction(args.view_xrange[1]))
     except Exception as e:
         print("{}: {}".format(type(e).__name__, e))
         return
