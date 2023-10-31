@@ -171,7 +171,7 @@ class CFraction(Complex):
             raise ZeroDivisionError("0 to a negative or complex power")
 
         if isinstance(power, Rational): # Rational(Real) exponents
-            if power.denominator == 1: # integer exponents
+            if abs(power.denominator) == 1: # integer exponents
                 # I think Fraction always stores the sign in the numerator, but I'm not 100% sure.
                 # this compensates just in case the numerator and denominator can vary in sign
                 power = abs(power.numerator) if power >= 0 else -1 * abs(power.numerator)
