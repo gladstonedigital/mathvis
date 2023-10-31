@@ -21,13 +21,15 @@ display_force_exact = False
 
 def prime_factor(num):
     factors = []
+    if num == 0:
+        return factors
     n = abs(num)
     while n % 2 == 0:
         factors.append(2)
         n //= 2
 
     i = 3
-    while i <= math.sqrt(n):
+    while i**2 <= n:
         while n % i == 0:
             factors.append(i)
             n //= i
@@ -63,10 +65,13 @@ class Polynomial():
         while len(coef) > 3:
             possible_num = sorted([Fraction(reduce(mul, num, 1)) for num in list(set(powerset(prime_factor(coef[-1]))))])
             possible_den = sorted([Fraction(reduce(mul, den, 1)) for den in list(set(powerset(prime_factor(coef[0]))))])
+            print(possible_den)
             possible_roots = [a * num / den for a in (1, -1) for den in possible_den for num in possible_num]
+            possible_roots.append(0)
             root = None
             quotient = None
             for r in possible_roots:
+                print("Testing root ", r)
                 result = synthetic_division(coef, r)
                 if result[0] == 0:
                     root = r
@@ -272,6 +277,8 @@ def main():
     if len(args.coefficients) < 3:
         print("Polynomial must have at least 3 terms")
         return
+
+    #args.coefficients = (CFraction(x) for x in args.coefficients)
 
     try:
         if len(args.coefficients) == 3:
